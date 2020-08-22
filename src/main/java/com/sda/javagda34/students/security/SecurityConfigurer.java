@@ -5,19 +5,21 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
+import javax.sql.DataSource;
+
 @EnableWebSecurity
 public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
+    private final DataSource dataSource;
+
+    public SecurityConfigurer(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
     @Autowired
     public void configureGlobal (AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
         authenticationManagerBuilder
-                .inMemoryAuthentication()
-                .withUser("user1").password("{noop}password").roles("USER")
-                .and()
-                .withUser("user2").password("{noop}password").roles("USER").disabled(true)
-                .and()
-                .withUser("admin").password("{noop}password").roles("ADMIN")
-                .and()
-                .withUser("superadmin").password("{noop}password").roles("USER", "ADMIN");
+                .jdbcAuthentication()
+                .dataSource(dataSource);
+
     }
 }
